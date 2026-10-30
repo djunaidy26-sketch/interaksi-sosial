@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full bg-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MPI IPS Fase B - Interaksi Sosial</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Fredoka & Inter for kid-friendly UI -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti for rewards -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brandBlue: '#00A8E8',
+                        brandGreen: '#2ECC71',
+                        brandYellow: '#FFD166',
+                        brandOrange: '#FF70A6',
+                        brandOrangeDark: '#FF9F1C',
+                        funPurple: '#9D4EDD'
+                    },
+                    fontFamily: {
+                        fredoka: ['Fredoka', 'sans-serif'],
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Fredoka', 'Inter', sans-serif;
+            user-select: none;
+        }
+        .bounce-hover:hover {
+            transform: translateY(-4px) scale(1.02);
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .btn-shadow {
+            box-shadow: 0 6px 0 0 rgba(0,0,0,0.15);
+        }
+        .btn-shadow:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 0 rgba(0,0,0,0.15);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #FF9F1C;
+            border-radius: 10px;
+        }
+        .animate-pop {
+            animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes pop {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="h-full text-slate-800 flex flex-col bg-gradient-to-b from-sky-100 via-emerald-50 to-amber-50">
+
+    <!-- Top Navigation Header (Hidden on Welcome Screen) -->
+    <header id="topNav" class="hidden bg-white shadow-md border-b-4 border-yellow-400 sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-2 flex items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="navigateTo('mainMenu')">
+                <div class="w-10 h-10 rounded-full bg-brandBlue flex items-center justify-center text-white text-xl font-bold shadow-sm">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg md:text-xl font-bold text-sky-700 leading-tight">Interaksi Sosial</h1>
+                    <p class="text-xs text-slate-500 font-sans">IPS Kelas 3-4 SD (Fase B)</p>
+                </div>
+            </div>
+
+            <!-- Header Action Controls -->
+            <div class="flex items-center space-x-2">
+                <button onclick="toggleAudio()" id="soundBtn" class="p-2.5 px-3 bg-amber-100 hover:bg-amber-200 text-amber-800 rounded-full font-bold text-sm transition flex items-center gap-1.5 shadow-sm">
+                    <i class="fa-solid fa-volume-high text-base" id="soundIcon"></i>
+                    <span class="hidden sm:inline text-xs" id="soundText">Suara: ON</span>
+                </button>
+                <button onclick="navigateTo('mainMenu')" class="p-2.5 px-4 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full font-bold text-sm transition shadow-sm flex items-center gap-2">
+                    <i class="fa-solid fa-house"></i>
+                    <span class="hidden md:inline">Menu Utama</span>
+                </button>
+            </div>
+        </div>
+        <!-- Progress bar line -->
+        <div class="w-full bg-slate-200 h-1.5">
+            <div id="learningProgress" class="bg-gradient-to-r from-teal-400 to-blue-500 h-1.5 w-0 transition-all duration-500"></div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-1 max-w-6xl w-full mx-auto p-4 md:p-6 flex flex-col justify-center">
+
+        <!-- 1. HALAMAN PEMBUKA / WELCOME -->
+        <section id="welcomeScreen" class="text-center py-6 animate-pop">
+            <div class="bg-white/80 backdrop-blur-md p-6 md:p-10 rounded-3xl shadow-xl border-4 border-sky-300 max-w-3xl mx-auto">
+                <div class="inline-block px-4 py-1.5 bg-yellow-300 text-amber-900 rounded-full text-sm font-bold tracking-wide uppercase mb-3 shadow-sm">
+                    <i class="fa-solid fa-star mr-1"></i> IPS Fase B Kelas III & IV SD/MI
+                </div>
+                <h1 class="text-3xl md:text-5xl font-extrabold text-sky-600 mb-2 leading-tight">
+                    AYO BELAJAR <br><span class="text-amber-500 drop-shadow-sm">INTERAKSI SOSIAL!</span>
+                </h1>
+                <p class="text-slate-600 text-base md:text-lg mb-6 max-w-lg mx-auto font-sans">
+                    Petualangan seru memahami hubungan antar sesama manusia di rumah, sekolah, dan masyarakat.
+                </p>
+
+                <!-- Hero Mascot Vector Illustration -->
+                <div class="my-6 flex justify-center items-center gap-4 py-4 bg-sky-50 rounded-2xl border-2 border-dashed border-sky-200">
+                    <div class="text-center">
+                        <div class="w-20 h-20 md:w-24 md:h-24 mx-auto bg-amber-400 rounded-full flex items-center justify-center text-white text-4xl shadow-md transform -rotate-6">
+                            <i class="fa-solid fa-child"></i>
+                        </div>
+                        <p class="text-xs font-bold mt-2 text-slate-700">Tolong Menolong</p>
+                    </div>
+                    <div class="text-2xl text-sky-400 font-bold"><i class="fa-solid fa-arrows-rotate animate-spin" style="animation-duration: 8s;"></i></div>
+                    <div class="text-center">
+                        <div class="w-20 h-20 md:w-24 md:h-24 mx-auto bg-emerald-400 rounded-full flex items-center justify-center text-white text-4xl shadow-md transform rotate-6">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                        <p class="text-xs font-bold mt-2 text-slate-700">Kerja Sama</p>
+                    </div>
+                </div>
+
+                <button onclick="startApp()" class="w-full sm:w-auto px-10 py-4 bg-gradient-to-r from-orange-400 to-amber-500 hover:from-orange-500 hover:to-amber-600 text-white font-extrabold text-xl rounded-2xl btn-shadow transition-all bounce-hover flex items-center justify-center gap-3 mx-auto mt-4">
+                    <i class="fa-solid fa-play text-2xl"></i> MULAI BELAJAR
+                </button>
+            </div>
+        </section>
+
+
+        <!-- 2. HALAMAN MENU UTAMA -->
+        <section id="mainMenu" class="hidden animate-pop">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl md:text-3xl font-bold text-sky-700">Pilih Menu Pembelajaran</h2>
+                <p class="text-slate-600 font-sans text-sm">Klik salah satu tombol di bawah ini untuk memulai!</p>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                <!-- Card 1: Petunjuk -->
+                <button onclick="navigateTo('guideScreen')" class="bg-white hover:bg-sky-50 border-3 border-sky-200 p-5 rounded-2xl shadow-md text-center transition bounce-hover flex flex-col items-center justify-center group">
+                    <div class="w-16 h-16 bg-sky-100 group-hover:bg-sky-500 text-sky-600 group-hover:text-white rounded-2xl flex items-center justify-center text-3xl mb-3 transition">
+                        <i class="fa-solid fa-compass"></i>
+                    </div>
+                    <h3 class="font-bold text-slate-800 text-base md:text-lg">Petunjuk</h3>
+                    <p class="text-xs text-slate-500 font-sans mt-1">Cara pakai media</p>
+                </button>
+
+                <!-- Card 2: Tujuan -->
+                <button onclick="navigateTo('objectiveScreen')" class="bg-white hover:bg-emerald-50 border-3 border-emerald-200 p-5 rounded-2xl shadow-md text-center transition bounce-hover flex flex-col items-center justify-center group">
+                    <div class="w-16 h-16 bg-emerald-100 group-hover:bg-emerald-500 text-emerald-600 group-hover:text-white rounded-2xl flex items-center justify-center text-3xl mb-3 transition">
+                        <i class="fa-solid fa-bullseye"></i>
+                    </div>
+                    <h3 class="font-bold text-slate-800 text-base md:text-lg">Tujuan Belajar</h3>
+                    <p class="text-xs text-slate-500 font-sans mt-1">Target kemampuan</p>
+                </button>
+
+                <!-- Card 3: Materi -->
+                <button onclick="navigateTo('materialScreen')" class="bg-white hover:bg-amber-50 border-3 border-amber-200 p-5 rounded-2xl shadow-md text-center transition bounce-hover flex flex-col items-center justify-center group col-span-2 sm:col-span-1">
+                    <div class="w-16 h-16 bg-amber-100 group-hover:bg-amber-500 text-amber-600 group-hover:text-white rounded-2xl flex items-center justify-center text-3xl mb-3 transition">
+                        <i class="fa-solid fa-book-open"></i>
+                    </div>
+                    <h3 class="font-bold text-slate-800 text-base md:text-lg">Materi Pelajaran</h3>
+                    <p class="text-xs text-slate-500 font-sans mt-1">Penjelasan &amp; Contoh</p>
+                </button>
+
+                <!-- Card 4: Video -->
+                <button onclick="navigateTo('videoScreen')" class="bg-white hover:bg-red-50 border-3 border-red-200 p-5 rounded-2xl shadow-md text-center transition bounce-hover flex flex-col items-center justify-center group">
+                    <div class="w-16 h-16 bg-red-100 group-hover:bg-red-500 text-red-600 group-hover:text-white rounded-2xl flex items-center justify-center text-3xl mb-3 transition">
+                        <i class="fa-solid fa-circle-play"></i>
+                    </div>
+                    <h3 class="font-bold text-slate-800 text-base md:text-lg">Video Edukasi</h3>
+                    <p class="text-xs text-slate-500 font-sans mt-1">Tonton &amp; Pahami</p>
+                </button>
+
+                <!-- Card 5: Games -->
+                <button onclick="navigateTo('gameHubScreen')" class="bg-white hover:bg-purple-50 border-3 border-purple-200 p-5 rounded-2xl shadow-md text-center transition bounce-hover flex flex-col items-center justify-center group">
+                    <div class="w-16 h-16 bg-purple-100 group-hover:bg-purple-500 text-purple-600 group-hover:text-white rounded-2xl flex items-center justify-center text-3xl mb-3 transition">
+                        <i class="fa-solid fa-gamepad"></i>
+                    </div>
+                    <h3 class="font-bold text-slate-800 text-base md:text-lg">Game Edukasi</h3>
+                    <p class="text-xs text-slate-500 font-sans mt-1">3 Permainan Seru</p>
+                </button>
+
+                <!-- Card 6: Kuis -->
+                <button onclick="navigateTo('quizScreen')" class="bg-white hover:bg-orange-50 border-3 border-orange-200 p-5 rounded-2xl shadow-md text-center transition bounce-hover flex flex-col items-center justify-center group">
+                    <div class="w-16 h-16 bg-orange-100 group-hover:bg-orange-500 text-orange-600 group-hover:text-white rounded-2xl flex items-center justify-center text-3xl mb-3 transition">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </div>
+                    <h3 class="font-bold text-slate-800 text-base md:text-lg">Kuis Evaluasi</h3>
+                    <p class="text-xs text-slate-500 font-sans mt-1">Uji pemahamanmu</p>
+                </button>
+
+                <!-- Card 7: Profil -->
+                <button onclick="navigateTo('profileScreen')" class="bg-white hover:bg-teal-50 border-3 border-teal-200 p-5 rounded-2xl shadow-md text-center transition bounce-hover flex flex-col items-center justify-center group col-span-2 sm:col-span-2 lg:col-span-2">
+                    <div class="w-16 h-16 bg-teal-100 group-hover:bg-teal-500 text-teal-600 group-hover:text-white rounded-2xl flex items-center justify-center text-3xl mb-3 transition">
+                        <i class="fa-solid fa-id-card"></i>
+                    </div>
+                    <h3 class="font-bold text-slate-800 text-base md:text-lg">Profil Pengembang</h3>
+                    <p class="text-xs text-slate-500 font-sans mt-1">Informasi Pembuat MPI</p>
+                </button>
+            </div>
+        </section>
+
+
+        <!-- 3. HALAMAN PETUNJUK PENGGUNAAN -->
+        <section id="guideScreen" class="hidden animate-pop">
+            <div class="bg-white rounded-3xl p-6 md:p-8 shadow-lg border-2 border-sky-100">
+                <div class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100">
+                    <div class="p-3 bg-sky-100 text-sky-600 rounded-2xl text-2xl">
+                        <i class="fa-solid fa-compass"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-sky-800">Petunjuk Penggunaan</h2>
+                        <p class="text-slate-500 text-sm font-sans">Cara mudah menggunakan media pembelajaran ini</p>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-6 mb-6">
+                    <div class="p-5 bg-sky-50 rounded-2xl border border-sky-200 flex flex-col items-center text-center">
+                        <div class="w-12 h-12 bg-sky-500 text-white rounded-full flex items-center justify-center font-bold text-xl mb-3">1</div>
+                        <h3 class="font-bold text-slate-800 mb-1">Pelajari Materi</h3>
+                        <p class="text-xs text-slate-600 font-sans">Buka menu Materi dan Video untuk membaca serta menyimak penjelasan lengkap interaksi sosial.</p>
+                    </div>
+                    <div class="p-5 bg-emerald-50 rounded-2xl border border-emerald-200 flex flex-col items-center text-center">
+                        <div class="w-12 h-12 bg-emerald-500 text-white rounded-full flex items-center justify-center font-bold text-xl mb-3">2</div>
+                        <h3 class="font-bold text-slate-800 mb-1">Mainkan Game</h3>
+                        <p class="text-xs text-slate-600 font-sans">Uji pemahaman awalmu melalui 3 permainan seru yang melatih ketelitian dan kecepatan.</p>
+                    </div>
+                    <div class="p-5 bg-amber-50 rounded-2xl border border-amber-200 flex flex-col items-center text-center">
+                        <div class="w-12 h-12 bg-amber-500 text-white rounded-full flex items-center justify-center font-bold text-xl mb-3">3</div>
+                        <h3 class="font-bold text-slate-800 mb-1">Kerjakan Kuis</h3>
+                        <p class="text-xs text-slate-600 font-sans">Jawab 10 soal evaluasi untuk mengukur skor dan tingkat pemahaman akhirmu!</p>
+                    </div>
+                </div>
+
+                <div class="bg-amber-100/70 border border-amber-300 rounded-2xl p-4 flex items-center gap-3 text-amber-900 font-sans text-sm">
+                    <i class="fa-solid fa-lightbulb text-2xl text-amber-600"></i>
+                    <span><strong>Tips:</strong> Gunakan tombol navigasi di bagian bawah halaman materi untuk berpindah slide dengan mudah.</span>
+                </div>
+
+                <div class="mt-6 text-right">
+                    <button onclick="navigateTo('mainMenu')" class="px-6 py-2.5 bg-slate-700 hover:bg-slate-800 text-white rounded-xl font-bold transition">Kembali ke Menu</button>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- 4. HALAMAN TUJUAN PEMBELAJARAN -->
+        <section id="objectiveScreen" class="hidden animate-pop">
+            <div class="bg-white rounded-3xl p-6 md:p-8 shadow-lg border-2 border-emerald-100">
+                <div class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100">
+                    <div class="p-3 bg-emerald-100 text-emerald-600 rounded-2xl text-2xl">
+                        <i class="fa-solid fa-bullseye"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-emerald-800">Tujuan Pembelajaran</h2>
+                        <p class="text-slate-500 text-sm font-sans">Capaian yang akan kamu kuasai setelah belajar</p>
+                    </div>
+                </div>
+
+                <div class="space-y-3 font-sans">
+                    <div class="p-4 bg-emerald-50/60 rounded-2xl border border-emerald-200 flex items-start gap-4">
+                        <div class="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold flex-shrink-0 mt-0.5">1</div>
+                        <p class="text-slate-700 text-sm md:text-base font-medium">Menjelaskan pengertian <strong>interaksi sosial</strong> dengan bahasa sederhana.</p>
+                    </div>
+                    <div class="p-4 bg-emerald-50/60 rounded-2xl border border-emerald-200 flex items-start gap-4">
+                        <div class="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold flex-shrink-0 mt-0.5">2</div>
+                        <p class="text-slate-700 text-sm md:text-base font-medium">Mengidentifikasi <strong>bentuk-bentuk interaksi sosial</strong> (kerja sama, tolong-menolong, diskusi, persaingan).</p>
+                    </div>
+                    <div class="p-4 bg-emerald-50/60 rounded-2xl border border-emerald-200 flex items-start gap-4">
+                        <div class="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold flex-shrink-0 mt-0.5">3</div>
+                        <p class="text-slate-700 text-sm md:text-base font-medium">Menyebutkan contoh interaksi sosial di <strong>rumah, sekolah, dan masyarakat</strong>.</p>
+                    </div>
+                    <div class="p-4 bg-emerald-50/60 rounded-2xl border border-emerald-200 flex items-start gap-4">
+                        <div class="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold flex-shrink-0 mt-0.5">4</div>
+                        <p class="text-slate-700 text-sm md:text-base font-medium">Membedakan contoh interaksi sosial yang <strong>baik (positif)</strong> dan <strong>kurang baik (negatif)</strong>.</p>
+                    </div>
+                    <div class="p-4 bg-emerald-50/60 rounded-2xl border border-emerald-200 flex items-start gap-4">
+                        <div class="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold flex-shrink-0 mt-0.5">5</div>
+                        <p class="text-slate-700 text-sm md:text-base font-medium">Menunjukkan sikap <strong>saling menghargai, bekerja sama, dan tolong-menolong</strong> dalam kehidupan sehari-hari.</p>
+                    </div>
+                </div>
+
+                <div class="mt-6 flex justify-between items-center">
+                    <button onclick="navigateTo('mainMenu')" class="px-6 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-xl font-bold transition">Kembali</button>
+                    <button onclick="navigateTo('materialScreen')" class="px-6 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-bold transition">Mulai Belajar Materi <i class="fa-solid fa-arrow-right ml-1"></i></button>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- 5. HALAMAN MATERI PEMBELAJARAN (BERTAHAP / SLIDE INTERAKTIF) -->
+        <section id="materialScreen" class="hidden animate-pop">
+            <div class="bg-white rounded-3xl p-6 md:p-8 shadow-xl border-2 border-amber-200 min-h-[480px] flex flex-col justify-between">
+                
+                <!-- Slide Header -->
+                <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+                    <div class="flex items-center gap-3">
+                        <span class="px-3 py-1 bg-amber-100 text-amber-800 font-bold rounded-full text-xs" id="materialStepBadge">Bagian 1 dari 4</span>
+                        <h2 class="text-xl md:text-2xl font-bold text-amber-800" id="materialTitle">Pengertian Interaksi Sosial</h2>
+                    </div>
+                </div>
+
+                <!-- Slide Content Area -->
+                <div id="materialContentArea" class="py-6 flex-1 font-sans">
+                    <!-- Dynamic Slide Content Loaded via JS -->
+                </div>
+
+                <!-- Material Slide Controls -->
+                <div class="pt-4 border-t border-slate-100 flex items-center justify-between">
+                    <button onclick="prevMaterialStep()" id="prevMatBtn" class="px-5 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl font-bold transition disabled:opacity-40 disabled:cursor-not-allowed">
+                        <i class="fa-solid fa-chevron-left mr-1"></i> Sebelumnya
+                    </button>
+
+                    <!-- Indicators -->
+                    <div class="flex space-x-2" id="materialDots">
+                        <span class="w-3 h-3 rounded-full bg-amber-500"></span>
+                        <span class="w-3 h-3 rounded-full bg-slate-200"></span>
+                        <span class="w-3 h-3 rounded-full bg-slate-200"></span>
+                        <span class="w-3 h-3 rounded-full bg-slate-200"></span>
+                    </div>
+
+                    <button onclick="nextMaterialStep()" id="nextMatBtn" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-bold transition">
+                        Selanjutnya <i class="fa-solid fa-chevron-right ml-1"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- 6. HALAMAN VIDEO PEMBELAJARAN -->
+        <section id="videoScreen" class="hidden animate-pop">
+            <div class="bg-white rounded-3xl p-6 md:p-8 shadow-lg border-2 border-red-100">
+                <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
+                    <div class="flex items-center gap-3">
+                        <div class="p-3 bg-red-100 text-red-600 rounded-2xl text-2xl">
+                            <i class="fa-solid fa-circle-play"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-bold text-red-800">Video Pembelajaran</h2>
+                            <p class="text-slate-500 text-sm font-sans">Saksikan animasi penjelasan tentang interaksi sosial!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Responsive Video Embed Container -->
+                <div class="relative w-full rounded-2xl overflow-hidden bg-black shadow-lg aspect-video mb-6">
+                    <iframe id="videoIframe" class="w-full h-full border-0" src="https://www.youtube.com/embed/dQw4w9WgXcQ?rel=0" title="Video Interaksi Sosial SD" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+
+                <!-- Video Description Card -->
+                <div class="p-4 bg-red-50 rounded-2xl border border-red-200 text-slate-700 font-sans text-sm">
+                    <h4 class="font-bold text-red-900 mb-1 flex items-center gap-2">
+                        <i class="fa-solid fa-circle-info"></i> Catatan Pembelajaran Video:
+                    </h4>
+                    <p>Interaksi sosial terjadi karena manusia tidak dapat hidup sendiri (manusia adalah makhluk sosial). Melalui video ini, kita melihat betapa pentingnya saling tegur sapa, membantu teman, dan bermusyawarah.</p>
+                </div>
+
+                <div class="mt-6 flex justify-between items-center">
+                    <button onclick="navigateTo('mainMenu')" class="px-6 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-xl font-bold transition">Kembali</button>
+                    <button onclick="navigateTo('gameHubScreen')" class="px-6 py-2.5 bg-purple-500 hover:bg-purple-600 text-white rounded-xl font-bold transition">Lanjut ke Game <i class="fa-solid fa-gamepad ml-1"></i></button>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- 7. HALAMAN HUB GAME INTERAKTIF -->
+        <section id="gameHubScreen" class="hidden animate-pop">
+            <div class="text-center mb-6">
+                <span class="px-4 py-1 bg-purple-100 text-purple-700 rounded-full font-bold text-xs uppercase tracking-wider">Bermain Sambil Belajar</span>
+                <h2 class="text-2xl md:text-3xl font-bold text-purple-800 mt-1">Pilih Game Edukasi</h2>
+                <p class="text-slate-600 font-sans text-sm">Selesaikan permainan untuk mengumpulkan nilai!</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6">
+                <!-- Game 1 Card -->
+                <div class="bg-white border-2 border-purple-200 rounded-3xl p-6 shadow-md hover:shadow-xl transition flex flex-col justify-between">
+                    <div>
+                        <div class="w-14 h-14 bg-purple-100 text-purple-600 rounded-2xl flex items-center justify-center text-2xl mb-4">
+                            <i class="fa-solid fa-object-group"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-800 mb-2">1. Match &amp; Pair</h3>
+                        <p class="text-xs text-slate-600 font-sans mb-4">Cocokkan gambar aktivitas dengan jenis interaksi sosial yang tepat.</p>
+                    </div>
+                    <button onclick="startMatchGame()" class="w-full py-3 bg-purple-500 hover:bg-purple-600 text-white rounded-xl font-bold transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-play"></i> Mainkan Game
+                    </button>
+                </div>
+
+                <!-- Game 2 Card -->
+                <div class="bg-white border-2 border-sky-200 rounded-3xl p-6 shadow-md hover:shadow-xl transition flex flex-col justify-between">
+                    <div>
+                        <div class="w-14 h-14 bg-sky-100 text-sky-600 rounded-2xl flex items-center justify-center text-2xl mb-4">
+                            <i class="fa-solid fa-check-double"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-800 mb-2">2. Benar atau Salah</h3>
+                        <p class="text-xs text-slate-600 font-sans mb-4">Tentukan apakah pernyataan situasi interaksi sosial bernilai benar atau salah.</p>
+                    </div>
+                    <button onclick="startTrueFalseGame()" class="w-full py-3 bg-sky-500 hover:bg-sky-600 text-white rounded-xl font-bold transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-play"></i> Mainkan Game
+                    </button>
+                </div>
+
+                <!-- Game 3 Card -->
+                <div class="bg-white border-2 border-emerald-200 rounded-3xl p-6 shadow-md hover:shadow-xl transition flex flex-col justify-between">
+                    <div>
+                        <div class="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center text-2xl mb-4">
+                            <i class="fa-solid fa-masks-theater"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-800 mb-2">3. Detektif Sikap</h3>
+                        <p class="text-xs text-slate-600 font-sans mb-4">Pilih tindakan terpuji dan terbaik berdasarkan contoh cerita sehari-hari.</p>
+                    </div>
+                    <button onclick="startChoiceGame()" class="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-bold transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-play"></i> Mainkan Game
+                    </button>
+                </div>
+            </div>
+
+            <div class="mt-8 text-center">
+                <button onclick="navigateTo('mainMenu')" class="px-6 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-xl font-bold transition">Kembali ke Menu Utama</button>
+            </div>
+        </section>
+
+
+        <!-- 7A. MINIGAME 1: MATCHING GAME -->
+        <section id="game1Screen" class="hidden animate-pop">
+            <div class="bg-white rounded-3xl p-6 md:p-8 shadow-xl border-2 border-purple-200">
+                <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
+                    <h3 class="text-xl font-bold text-purple-800"><i class="fa-solid fa-object-group mr-2"></i> Game Match &amp; Pair</h3>
+                    <div class="bg-purple-100 px-4 py-1 rounded-full text-purple-800 font-bold text-sm" id="matchScoreBadge">Skor: 0</div>
+                </div>
+
+                <p class="text-xs text-slate-600 font-sans mb-4">Klik satu item di sebelah <strong>KIRI</strong>, lalu klik pasangannya yang sesuai di sebelah <strong>KANAN</strong>!</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 font-sans text-sm mb-6">
+                    <!-- Column Left -->
+                    <div class="space-y-3" id="matchLeftCol">
+                        <!-- Dynamic render -->
+                    </div>
+
+                    <!-- Column Right -->
+                    <div class="space-y-3" id="matchRightCol">
+                        <!-- Dynamic render -->
+                    </div>
+                </div>
+
+                <div id="matchFeedback" class="hidden p-3 mb-4 rounded-xl text-center font-bold text-sm"></div>
+
+                <div class="flex justify-between items-center">
+                    <button onclick="navigateTo('gameHubScreen')" class="px-5 py-2 bg-slate-200 text-slate-700 rounded-xl font-bold">Keluar Game</button>
+                    <button onclick="startMatchGame()" class="px-5 py-2 bg-purple-100 text-purple-700 hover:bg-purple-200 rounded-xl font-bold">Acak Ulang</button>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- 7B. MINIGAME 2: TRUE / FALSE -->
+        <section id="game2Screen" class="hidden animate-pop">
+            <div class="bg-white rounded-3xl p-6 md:p-8 shadow-xl border-2 border-sky-200 max-w-2xl mx-auto">
+                <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
+                    <h3 class="text-xl font-bold text-sky-800"><i class="fa-solid fa-check-double mr-2"></i> Benar atau Salah?</h3>
+                    <div class="bg-sky-100 px-4 py-1 rounded-full text-sky-800 font-bold text-sm" id="tfScoreBadge">Soal 1/5</div>
+                </div>
+
+                <div class="py-6 text-center">
+                    <div class="w-16 h-16 bg-sky-100 text-sky-500 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">
+                        <i class="fa-solid fa-question"></i>
+                    </div>
+                    <p class="text-base md:text-lg font-bold text-slate-800 max-w-md mx-auto" id="tfQuestionText">
+                        "Gotong royong membersihkan selokan kampung adalah contoh interaksi sosial di masyarakat."
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 my-4">
+                    <button onclick="answerTF(true)" class="py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-lg rounded-2xl btn-shadow transition flex flex-col items-center justify-center gap-1">
+                        <i class="fa-solid fa-circle-check text-2xl"></i> BENAR
+                    </button>
+                    <button onclick="answerTF(false)" class="py-4 bg-red-500 hover:bg-red-600 text-white font-extrabold text-lg rounded-2xl btn-shadow transition flex flex-col items-center justify-center gap-1">
+                        <i class="fa-solid fa-circle-xmark text-2xl"></i> SALAH
+                    </button>
+                </div>
+
+                <div id="tfFeedback" class="hidden p-3 mt-4 rounded-xl text-center font-bold text-sm"></div>
+
+                <div class="mt-6 text-center">
+                    <button onclick="navigateTo('gameHubScreen')" class="px-5 py-2 bg-slate-200 text-slate-700 rounded-xl font-bold text-xs">Kembali ke Hub Game</button>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- 7C. MINIGAME 3: SITUATION CHOICE -->
+        <section id="game3Screen" class="hidden animate-pop">
+            <div class="bg-white rounded-3xl p-6 md:p-8 shadow-xl border-2 border-emerald-200 max-w-2xl mx-auto">
+                <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
+                    <h3 class="text-xl font-bold text-emerald-800"><i class="fa-solid fa-masks-theater mr-2"></i> Detektif Sikap Baik</h3>
+                    <div class="bg-emerald-100 px-4 py-1 rounded-full text-emerald-800 font-bold text-sm" id="choiceScoreBadge">Kasus 1/4</div>
+                </div>
+
+                <div class="p-4 bg-emerald-50 rounded-2xl border border-emerald-200 mb-4 font-sans text-slate-700">
+                    <span class="font-bold text-emerald-900 block mb-1 text-xs uppercase tracking-wide">Situasi Hari Ini:</span>
+                    <p class="text-sm md:text-base font-semibold text-slate-800" id="choiceScenarioText">
+                        Teman sekelasmu, Budi, terjatuh saat berlari di halaman sekolah dan pensilnya berserakan.
+                    </p>
+                </div>
+
+                <p class="text-xs text-slate-500 font-sans mb-3">Apa tindakan yang paling tepat untuk kamu lakukan?</p>
+
+                <div class="space-y-3 font-sans" id="choiceOptionsContainer">
+                    <!-- Render options dynamically -->
+                </div>
+
+                <div id="choiceFeedback" class="hidden p-3 mt-4 rounded-xl text-center font-bold text-sm"></div>
+
+                <div class="mt-6 text-center">
+                    <button onclick="navigateTo('gameHubScreen')" class="px-5 py-2 bg-slate-200 text-slate-700 rounded-xl font-bold text-xs">Kembali ke Hub Game</button>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- 8. HALAMAN KUIS EVALUASI (10 SOAL) -->
+        <section id="quizScreen" class="hidden animate-pop">
+            <div class="bg-white rounded-3xl p-6 md:p-8 shadow-xl border-2 border-orange-200 max-w-3xl mx-auto">
+                
+                <!-- Quiz Header -->
+                <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2.5 bg-orange-100 text-orange-600 rounded-xl text-xl">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-bold text-orange-900">Kuis Evaluasi IPS</h2>
+                            <p class="text-xs text-slate-500 font-sans">Jawablah dengan cermat!</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-xs font-bold text-slate-400 block font-sans">Nomor Soal</span>
+                        <span class="text-base font-extrabold text-orange-600" id="quizNumBadge">1 / 10</span>
+                    </div>
+                </div>
+
+                <!-- Quiz Question Box -->
+                <div class="mb-6">
+                    <h3 class="text-base md:text-lg font-bold text-slate-800 mb-4 leading-snug font-sans" id="quizQuestionText">
+                        Loading soal...
+                    </h3>
+
+                    <!-- 4 Options -->
+                    <div class="space-y-3 font-sans" id="quizOptionsBox">
+                        <!-- Rendered by JS -->
+                    </div>
+                </div>
+
+                <!-- Discussion Box (After Answered) -->
+                <div id="quizExplanationBox" class="hidden p-4 rounded-2xl mb-6 font-sans text-xs md:text-sm border animate-pop">
+                    <!-- Rendered by JS -->
+                </div>
+
+                <!-- Quiz Footer Controls -->
+                <div class="flex justify-between items-center pt-2">
+                    <button onclick="navigateTo('mainMenu')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl font-bold text-xs transition">Batal</button>
+                    <button onclick="nextQuizQuestion()" id="nextQuizBtn" class="hidden px-6 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold transition">
+                        Lanjut Soal <i class="fa-solid fa-arrow-right ml-1"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- 8B. HALAMAN HASIL KUIS EVALUASI -->
+        <section id="quizResultScreen" class="hidden animate-pop text-center">
+            <div class="bg-white rounded-3xl p-6 md:p-10 shadow-2xl border-4 border-orange-300 max-w-xl mx-auto">
+                <div class="w-24 h-24 rounded-full bg-amber-100 text-amber-500 flex items-center justify-center text-5xl mx-auto mb-4 shadow-inner" id="resultIcon">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+
+                <h2 class="text-3xl font-extrabold text-slate-800 mb-1" id="resultTitle">Luar Biasa!</h2>
+                <p class="text-slate-500 font-sans text-sm mb-6" id="resultSubtitle">Kamu telah menyelesaikan Kuis Evaluasi Interaksi Sosial.</p>
+
+                <!-- Score Board -->
+                <div class="bg-gradient-to-r from-orange-400 to-amber-400 text-white rounded-2xl p-6 mb-6 shadow-md">
+                    <p class="text-xs font-bold uppercase tracking-wider opacity-90">Nilai Akhir Kamu</p>
+                    <div class="text-5xl font-black my-2" id="quizFinalScore">100</div>
+                    <span class="inline-block px-4 py-1 bg-white/20 backdrop-blur-sm rounded-full text-xs font-bold" id="quizCategoryBadge">Sangat Baik / Tuntas</span>
+                </div>
+
+                <!-- Motivation Text -->
+                <div class="p-4 bg-sky-50 border border-sky-200 rounded-2xl text-slate-700 font-sans text-xs md:text-sm mb-6">
+                    <p id="motivationText">"Hebat! Kamu sudah belajar tentang Interaksi Sosial. Mari selalu bekerja sama, saling menghargai, dan tolong-menolong dalam kehidupan sehari-hari!"</p>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                    <button onclick="restartQuiz()" class="px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-xl shadow transition">
+                        <i class="fa-solid fa-rotate-right mr-1"></i> Ulangi Kuis
+                    </button>
+                    <button onclick="navigateTo('mainMenu')" class="px-6 py-3 bg-slate-700 hover:bg-slate-800 text-white font-bold rounded-xl shadow transition">
+                        <i class="fa-solid fa-house mr-1"></i> Menu Utama
+                    </button>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- 9. HALAMAN PROFIL PENGEMBANG -->
+        <section id="profileScreen" class="hidden animate-pop">
+            <div class="bg-white rounded-3xl p-6 md:p-8 shadow-lg border-2 border-teal-100 max-w-2xl mx-auto">
+                <div class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100">
+                    <div class="p-3 bg-teal-100 text-teal-600 rounded-2xl text-2xl">
+                        <i class="fa-solid fa-id-card"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-teal-800">Profil Pengembang</h2>
+                        <p class="text-slate-500 text-sm font-sans">Tim Pembelajaran Digital IPS SD/MI</p>
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row items-center gap-6 font-sans">
+                    <div class="w-28 h-28 bg-teal-500 text-white rounded-3xl flex items-center justify-center text-5xl shadow-md border-4 border-teal-100 flex-shrink-0">
+                        <i class="fa-solid fa-user-graduate"></i>
+                    </div>
+                    <div class="space-y-2 text-center sm:text-left">
+                        <h3 class="text-xl font-bold text-slate-800">Tim Pengembang MPI IPS</h3>
+                        <p class="text-xs bg-teal-100 text-teal-800 font-bold px-3 py-1 rounded-full inline-block">Pengembang Media Digital SD</p>
+                        <ul class="text-xs text-slate-600 space-y-1.5 pt-2">
+                            <li><i class="fa-solid fa-book-bookmark text-teal-500 mr-2"></i><strong>Mata Pelajaran:</strong> IPS (Fase B Kelas 3-4 SD)</li>
+                            <li><i class="fa-solid fa-layer-group text-teal-500 mr-2"></i><strong>Materi:</strong> Interaksi Sosial &amp; Sikap Bermasyarakat</li>
+                            <li><i class="fa-solid fa-code text-teal-500 mr-2"></i><strong>Teknologi:</strong> HTML5, Tailwind CSS, JavaScript (Vanilla JS)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="mt-8 pt-4 border-t border-slate-100 text-center">
+                    <button onclick="navigateTo('mainMenu')" class="px-6 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-xl font-bold transition">Kembali ke Menu Utama</button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Global Footer -->
+    <footer class="py-3 text-center text-xs text-slate-500 font-sans border-t border-slate-200/60 bg-white/50">
+        Media Pembelajaran Interaktif (MPI) IPS Fase B &copy; 2026 - Ramah Anak &amp; Responsive
+    </footer>
+
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        /* -------------------------------------------------------------
+           1. AUDIO SYNTHESIZER (Web Audio API - No External Files)
+           ------------------------------------------------------------- */
+        let audioEnabled = true;
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new AudioCtx();
+            }
+        }
+
+        function playSound(type) {
+            if (!audioEnabled) return;
+            try {
+                initAudio();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                const now = audioCtx.currentTime;
+
+                if (type === 'correct') {
+                    // Upward arpeggio
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(523.25, now); // C5
+                    osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.1); // E5
+                    osc.frequency.exponentialRampToValueAtTime(783.99, now + 0.2); // G5
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+                    osc.start(now);
+                    osc.stop(now + 0.35);
+                } else if (type === 'wrong') {
+                    // Low tone
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(220, now); // A3
+                    osc.frequency.exponentialRampToValueAtTime(130.81, now + 0.2); // C3
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                } else if (type === 'click') {
+                    // Short blip
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(400, now);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+                    osc.start(now);
+                    osc.stop(now + 0.08);
+                }
+            } catch (e) {
+                console.log("Audio error or blocked:", e);
+            }
+        }
+
+        function toggleAudio() {
+            audioEnabled = !audioEnabled;
+            const icon = document.getElementById('soundIcon');
+            const text = document.getElementById('soundText');
+
+            if (audioEnabled) {
+                icon.className = 'fa-solid fa-volume-high text-base';
+                text.innerText = 'Suara: ON';
+                playSound('click');
+            } else {
+                icon.className = 'fa-solid fa-volume-xmark text-base';
+                text.innerText = 'Suara: OFF';
+            }
+        }
+
+        /* -------------------------------------------------------------
+           2. NAVIGATION & SCREEN MANAGEMENT
+           ------------------------------------------------------------- */
+        const screens = [
+            'welcomeScreen', 'mainMenu', 'guideScreen', 'objectiveScreen',
+            'materialScreen', 'videoScreen', 'gameHubScreen', 'game1Screen',
+            'game2Screen', 'game3Screen', 'quizScreen', 'quizResultScreen', 'profileScreen'
+        ];
+
+        function navigateTo(screenId) {
+            playSound('click');
+            screens.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.add('hidden');
+            });
+
+            const target = document.getElementById(screenId);
+            if (target) {
+                target.classList.remove('hidden');
+            }
+
+            // Navigation Top Bar Visibility
+            const topNav = document.getElementById('topNav');
+            if (screenId === 'welcomeScreen') {
+                topNav.classList.add('hidden');
+            } else {
+                topNav.classList.remove('hidden');
+            }
+
+            // Update Progress Line dynamically
+            updateOverallProgress(screenId);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function startApp() {
+            navigateTo('mainMenu');
+        }
+
+        function updateOverallProgress(screenId) {
+            const progressMap = {
+                'mainMenu': 10,
+                'guideScreen': 20,
+                'objectiveScreen': 30,
+                'materialScreen': 50,
+                'videoScreen': 65,
+                'gameHubScreen': 80,
+                'quizScreen': 90,
+                'quizResultScreen': 100
+            };
+            const val = progressMap[screenId] || 15;
+            document.getElementById('learningProgress').style.width = val + '%';
+        }
+
+
+        /* -------------------------------------------------------------
+           3. MATERI PEMBELAJARAN (SLIDE DATA & LOGIC)
+           ------------------------------------------------------------- */
+        let currentMaterialStep = 0;
+        const materialData = [
+            {
+                title: "1. Pengertian Interaksi Sosial",
+                content: `
+                    <div class="space-y-4">
+                        <div class="p-4 bg-amber-50 rounded-2xl border border-amber-200 flex items-start gap-3">
+                            <i class="fa-solid fa-comments text-amber-500 text-3xl mt-1"></i>
+                            <div>
+                                <h4 class="font-bold text-amber-900 text-base">Apa itu Interaksi Sosial?</h4>
+                                <p class="text-sm text-slate-700 leading-relaxed mt-1">
+                                    <strong>Interaksi sosial</strong> adalah hubungan timbal balik (saling mempengaruhi) antara manusia. Manusia adalah <em>makhluk sosial</em>, artinya kita tidak bisa hidup sendiri dan selalu membutuhkan bantuan orang lain!
+                                </p>
+                            </div>
+                        </div>
+
+                        <h4 class="font-bold text-slate-800 text-sm mt-2">3 Jenis Hubungan Interaksi:</h4>
+                        <div class="grid sm:grid-cols-3 gap-3">
+                            <div class="p-3 bg-sky-50 rounded-xl border border-sky-200 text-center">
+                                <div class="w-10 h-10 bg-sky-500 text-white rounded-full flex items-center justify-center mx-auto mb-2 text-lg"><i class="fa-solid fa-user"></i> vs <i class="fa-solid fa-user"></i></div>
+                                <h5 class="font-bold text-xs text-sky-900">Individu dengan Individu</h5>
+                                <p class="text-[11px] text-slate-600 mt-1">Contoh: Kamu berbincang dengan sahabatmu.</p>
+                            </div>
+                            <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-center">
+                                <div class="w-10 h-10 bg-emerald-500 text-white rounded-full flex items-center justify-center mx-auto mb-2 text-lg"><i class="fa-solid fa-user"></i> vs <i class="fa-solid fa-users"></i></div>
+                                <h5 class="font-bold text-xs text-emerald-900">Individu dengan Kelompok</h5>
+                                <p class="text-[11px] text-slate-600 mt-1">Contoh: Guru menjelaskan pelajaran di depan kelas.</p>
+                            </div>
+                            <div class="p-3 bg-purple-50 rounded-xl border border-purple-200 text-center">
+                                <div class="w-10 h-10 bg-purple-500 text-white rounded-full flex items-center justify-center mx-auto mb-2 text-lg"><i class="fa-solid fa-users"></i> vs <i class="fa-solid fa-users"></i></div>
+                                <h5 class="font-bold text-xs text-purple-900">Kelompok dengan Kelompok</h5>
+                                <p class="text-[11px] text-slate-600 mt-1">Contoh: Pertandingan sepak bola antar dua tim sekolah.</p>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "2. Syarat Terjadinya Interaksi Sosial",
+                content: `
+                    <div class="space-y-4">
+                        <p class="text-sm text-slate-700">Agar interaksi sosial dapat terjadi, harus memenuhi <strong>2 syarat utama</strong> di bawah ini:</p>
+
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div class="p-4 bg-sky-50 rounded-2xl border border-sky-200">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <div class="w-10 h-10 bg-sky-500 text-white rounded-xl flex items-center justify-center text-xl font-bold">1</div>
+                                    <h4 class="font-bold text-sky-900">Kontak Sosial</h4>
+                                </div>
+                                <p class="text-xs text-slate-600 leading-relaxed">
+                                    Hubungan awal antara satu orang dengan orang lain. Kontak dapat bersifat <strong>langsung</strong> (tatap muka, berjabat tangan) atau <strong>tidak langsung</strong> (lewat telepon, berkirim pesan WhatsApp).
+                                </p>
+                            </div>
+
+                            <div class="p-4 bg-amber-50 rounded-2xl border border-amber-200">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <div class="w-10 h-10 bg-amber-500 text-white rounded-xl flex items-center justify-center text-xl font-bold">2</div>
+                                    <h4 class="font-bold text-amber-900">Komunikasi</h4>
+                                </div>
+                                <p class="text-xs text-slate-600 leading-relaxed">
+                                    Proses penyampaian pesan, ide, atau perasaan dari satu orang kepada orang lain sehingga pesan tersebut saling dipahami.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-800 font-medium">
+                            <i class="fa-solid fa-triangle-exclamation mr-1"></i> Jika kamu melewati seseorang di jalan tanpa saling menyapa/melihat, maka <strong>belum</strong> terjadi interaksi sosial!
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "3. Bentuk-Bentuk Interaksi Sosial",
+                content: `
+                    <div class="space-y-3">
+                        <p class="text-sm text-slate-700">Interaksi sosial dibagi menjadi dua kelompok besar:</p>
+
+                        <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-200">
+                            <h4 class="font-bold text-emerald-900 text-sm mb-1"><i class="fa-solid fa-thumbs-up text-emerald-600 mr-1"></i> A. Interaksi Positif (Menyatukan / Asosiatif)</h4>
+                            <ul class="text-xs text-slate-700 space-y-1 list-disc list-inside">
+                                <li><strong>Kerja sama:</strong> Bekerja bersama mencapai tujuan (contoh: piket kelas).</li>
+                                <li><strong>Tolong-menolong:</strong> Membantu sesama yang kesulitan tanpa pamrih.</li>
+                                <li><strong>Musyawarah / Diskusi:</strong> Berbicara bersama untuk menyelesaikan masalah.</li>
+                            </ul>
+                        </div>
+
+                        <div class="p-3 bg-orange-50 rounded-xl border border-orange-200">
+                            <h4 class="font-bold text-orange-900 text-sm mb-1"><i class="fa-solid fa-hand-fist text-orange-600 mr-1"></i> B. Interaksi Negatif (Meregangkan / Disosiatif)</h4>
+                            <ul class="text-xs text-slate-700 space-y-1 list-disc list-inside">
+                                <li><strong>Persaingan Sehat:</strong> Berlomba menjadi pemenang (contoh: lomba lari).</li>
+                                <li><strong>Pertentangan / Konflik:</strong> Pertengkaran atau perselisihan (harus kita hindari!).</li>
+                            </ul>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "4. Contoh Interaksi di Berbagai Lingkungan",
+                content: `
+                    <div class="space-y-3">
+                        <div class="p-3 bg-indigo-50 rounded-xl border border-indigo-200 flex items-center gap-3">
+                            <div class="w-12 h-12 bg-indigo-500 text-white rounded-2xl flex items-center justify-center text-2xl"><i class="fa-solid fa-house-chimney"></i></div>
+                            <div>
+                                <h4 class="font-bold text-indigo-900 text-xs">1. Di Rumah (Keluarga)</h4>
+                                <p class="text-xs text-slate-600">Membantu ibu mencuci piring, belajar bersama kakak, serta makan malam bersama keluarga.</p>
+                            </div>
+                        </div>
+
+                        <div class="p-3 bg-teal-50 rounded-xl border border-teal-200 flex items-center gap-3">
+                            <div class="w-12 h-12 bg-teal-500 text-white rounded-2xl flex items-center justify-center text-2xl"><i class="fa-solid fa-school"></i></div>
+                            <div>
+                                <h4 class="font-bold text-teal-900 text-xs">2. Di Sekolah</h4>
+                                <p class="text-xs text-slate-600">Mendengarkan penjelasan guru, berdiskusi dalam kelompok belajar, dan bermain saat istirahat.</p>
+                            </div>
+                        </div>
+
+                        <div class="p-3 bg-amber-50 rounded-xl border border-amber-200 flex items-center gap-3">
+                            <div class="w-12 h-12 bg-amber-500 text-white rounded-2xl flex items-center justify-center text-2xl"><i class="fa-solid fa-people-roof"></i></div>
+                            <div>
+                                <h4 class="font-bold text-amber-900 text-xs">3. Di Masyarakat</h4>
+                                <p class="text-xs text-slate-600">Ikut serta dalam gotong royong warga, menyapa tetangga, dan berbelanja di warung.</p>
+                            </div>
+                        </div>
+                    </div>
+                `
+            }
+        ];
+
+        function renderMaterialStep() {
+            const data = materialData[currentMaterialStep];
+            document.getElementById('materialTitle').innerText = data.title;
+            document.getElementById('materialStepBadge').innerText = `Bagian ${currentMaterialStep + 1} dari ${materialData.length}`;
+            document.getElementById('materialContentArea').innerHTML = data.content;
+
+            // Buttons
+            document.getElementById('prevMatBtn').disabled = (currentMaterialStep === 0);
+            if (currentMaterialStep === materialData.length - 1) {
+                document.getElementById('nextMatBtn').innerHTML = `Selesai &amp; Ke Video <i class="fa-solid fa-check ml-1"></i>`;
+            } else {
+                document.getElementById('nextMatBtn').innerHTML = `Selanjutnya <i class="fa-solid fa-chevron-right ml-1"></i>`;
+            }
+
+            // Dots indicator
+            const dots = document.getElementById('materialDots').children;
+            for (let i = 0; i < dots.length; i++) {
+                if (i === currentMaterialStep) {
+                    dots[i].className = "w-3 h-3 rounded-full bg-amber-500";
+                } else {
+                    dots[i].className = "w-3 h-3 rounded-full bg-slate-200";
+                }
+            }
+        }
+
+        function nextMaterialStep() {
+            playSound('click');
+            if (currentMaterialStep < materialData.length - 1) {
+                currentMaterialStep++;
+                renderMaterialStep();
+            } else {
+                navigateTo('videoScreen');
+            }
+        }
+
+        function prevMaterialStep() {
+            playSound('click');
+            if (currentMaterialStep > 0) {
+                currentMaterialStep--;
+                renderMaterialStep();
+            }
+        }
+
+        // Init initial slide
+        renderMaterialStep();
+
+
+        /* -------------------------------------------------------------
+           4. MINIGAME 1: MATCH & PAIR LOGIC
+           ------------------------------------------------------------- */
+        let matchScore = 0;
+        let selectedLeft = null;
+        let selectedRight = null;
+
+        const matchPairs = [
+            { id: 1, leftText: "Membantu Ibu Menyiapkan Makanan", rightText: "Interaksi di Rumah" },
+            { id: 2, leftText: "Berdiskusi Kelompok dengan Teman Kelas", rightText: "Interaksi di Sekolah" },
+            { id: 3, leftText: "Kerja Bakti Membersihkan Pos Ronda", rightText: "Interaksi di Masyarakat" },
+            { id: 4, leftText: "Lomba Lari Cepat Saat 17 Agustus", rightText: "Bentuk Persaingan Sehat" }
+        ];
+
+        function startMatchGame() {
+            matchScore = 0;
+            selectedLeft = null;
+            selectedRight = null;
+            document.getElementById('matchScoreBadge').innerText = `Skor: ${matchScore}`;
+            document.getElementById('matchFeedback').classList.add('hidden');
+
+            const leftCol = document.getElementById('matchLeftCol');
+            const rightCol = document.getElementById('matchRightCol');
+
+            leftCol.innerHTML = '';
+            rightCol.innerHTML = '';
+
+            // Shuffle right side
+            const shuffledRight = [...matchPairs].sort(() => Math.random() - 0.5);
+
+            matchPairs.forEach(p => {
+                leftCol.innerHTML += `
+                    <button onclick="selectMatch('left', ${p.id}, this)" id="m-left-${p.id}" class="w-full text-left p-3.5 bg-purple-50 hover:bg-purple-100 border-2 border-purple-200 rounded-2xl font-bold text-slate-700 transition">
+                        ${p.leftText}
+                    </button>
+                `;
+            });
+
+            shuffledRight.forEach(p => {
+                rightCol.innerHTML += `
+                    <button onclick="selectMatch('right', ${p.id}, this)" id="m-right-${p.id}" class="w-full text-left p-3.5 bg-slate-50 hover:bg-slate-100 border-2 border-slate-200 rounded-2xl font-bold text-slate-700 transition">
+                        ${p.rightText}
+                    </button>
+                `;
+            });
+
+            navigateTo('game1Screen');
+        }
+
+        function selectMatch(side, id, btn) {
+            playSound('click');
+            if (side === 'left') {
+                document.querySelectorAll('#matchLeftCol button').forEach(b => b.classList.remove('border-purple-600', 'bg-purple-200'));
+                btn.classList.add('border-purple-600', 'bg-purple-200');
+                selectedLeft = id;
+            } else {
+                document.querySelectorAll('#matchRightCol button').forEach(b => b.classList.remove('border-purple-600', 'bg-purple-200'));
+                btn.classList.add('border-purple-600', 'bg-purple-200');
+                selectedRight = id;
+            }
+
+            if (selectedLeft !== null && selectedRight !== null) {
+                checkMatchPair();
+            }
+        }
+
+        function checkMatchPair() {
+            const feedback = document.getElementById('matchFeedback');
+            feedback.classList.remove('hidden');
+
+            if (selectedLeft === selectedRight) {
+                playSound('correct');
+                feedback.className = "p-3 mb-4 rounded-xl text-center font-bold text-sm bg-emerald-100 text-emerald-800 animate-pop";
+                feedback.innerText = "Hebratt! Pasanganmu Benar! 🎉";
+
+                document.getElementById(`m-left-${selectedLeft}`).disabled = true;
+                document.getElementById(`m-right-${selectedRight}`).disabled = true;
+
+                document.getElementById(`m-left-${selectedLeft}`).className = "w-full text-left p-3.5 bg-emerald-100 border-2 border-emerald-400 rounded-2xl font-bold text-emerald-800 opacity-60";
+                document.getElementById(`m-right-${selectedRight}`).className = "w-full text-left p-3.5 bg-emerald-100 border-2 border-emerald-400 rounded-2xl font-bold text-emerald-800 opacity-60";
+
+                matchScore += 25;
+                document.getElementById('matchScoreBadge').innerText = `Skor: ${matchScore}`;
+
+                if (matchScore === 100) {
+                    confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
+                    feedback.innerText = "Luar Biasa! Semua Pasangan Berhasil Dicocokkan! 🏆";
+                }
+            } else {
+                playSound('wrong');
+                feedback.className = "p-3 mb-4 rounded-xl text-center font-bold text-sm bg-red-100 text-red-800 animate-pop";
+                feedback.innerText = "Kurang Tepat! Coba Pasangkan Lagi Ya! ❌";
+
+                document.querySelectorAll('#matchLeftCol button').forEach(b => b.classList.remove('border-purple-600', 'bg-purple-200'));
+                document.querySelectorAll('#matchRightCol button').forEach(b => b.classList.remove('border-purple-600', 'bg-purple-200'));
+            }
+
+            selectedLeft = null;
+            selectedRight = null;
+        }
+
+
+        /* -------------------------------------------------------------
+           5. MINIGAME 2: BENAR ATAU SALAH LOGIC
+           ------------------------------------------------------------- */
+        let tfIndex = 0;
+        let tfScore = 0;
+
+        const tfQuestions = [
+            { text: "Gotong royong membersihkan lingkungan rumah adalah contoh interaksi di masyarakat.", answer: true },
+            { text: "Mengejek teman yang mendapat nilai kurang baik adalah contoh interaksi sosial yang terpuji.", answer: false },
+            { text: "Syarat terjadinya interaksi sosial adalah adanya kontak sosial dan komunikasi.", answer: true },
+            { text: "Manusia dapat hidup sendirian tanpa bantuan orang lain sama sekali.", answer: false },
+            { text: "Mendengarkan penjelasan guru saat mengajar adalah interaksi antara individu dan kelompok.", answer: true }
+        ];
+
+        function startTrueFalseGame() {
+            tfIndex = 0;
+            tfScore = 0;
+            renderTFQuestion();
+            navigateTo('game2Screen');
+        }
+
+        function renderTFQuestion() {
+            document.getElementById('tfScoreBadge').innerText = `Soal ${tfIndex + 1}/${tfQuestions.length}`;
+            document.getElementById('tfQuestionText').innerText = `"${tfQuestions[tfIndex].text}"`;
+            document.getElementById('tfFeedback').classList.add('hidden');
+        }
+
+        function answerTF(userAns) {
+            const current = tfQuestions[tfIndex];
+            const feedback = document.getElementById('tfFeedback');
+            feedback.classList.remove('hidden');
+
+            if (userAns === current.answer) {
+                playSound('correct');
+                tfScore += 20;
+                feedback.className = "p-3 mt-4 rounded-xl text-center font-bold text-sm bg-emerald-100 text-emerald-800 animate-pop";
+                feedback.innerText = "Jawabanmu Tepat Sekali! 👏";
+            } else {
+                playSound('wrong');
+                feedback.className = "p-3 mt-4 rounded-xl text-center font-bold text-sm bg-red-100 text-red-800 animate-pop";
+                feedback.innerText = "Ups! Kurang Tepat. Tetap Semangat! 😃";
+            }
+
+            setTimeout(() => {
+                tfIndex++;
+                if (tfIndex < tfQuestions.length) {
+                    renderTFQuestion();
+                } else {
+                    confetti({ particleCount: 70, spread: 60, origin: { y: 0.6 } });
+                    alert(`Permainan Selesai! Skor Kamu: ${tfScore}/100`);
+                    navigateTo('gameHubScreen');
+                }
+            }, 1200);
+        }
+
+
+        /* -------------------------------------------------------------
+           6. MINIGAME 3: DETEKTIF SIKAP (CHOICE GAME)
+           ------------------------------------------------------------- */
+        let choiceIndex = 0;
+        const choiceScenarios = [
+            {
+                text: "Teman sekelasmu, Budi, terjatuh saat berlari di halaman sekolah dan pensilnya berserakan.",
+                options: [
+                    { text: "Pura-pura tidak melihat dan terus bermain", correct: false },
+                    { text: "Hampiri Budi, membantunya berdiri dan memungut pensilnya", correct: true },
+                    { text: "Mentertawakan Budi bersama teman lain", correct: false }
+                ]
+            },
+            {
+                text: "Ibu sedang sibuk merapikan meja makan setelah keluarga selesai makan malam.",
+                options: [
+                    { text: "Membantu Ibu membawa piring kotor ke dapur", correct: true },
+                    { text: "Langsung pergi ke kamar menonton TV", correct: false },
+                    { text: "Menyuruh adik saja yang membantu Ibu", correct: false }
+                ]
+            },
+            {
+                text: "Dalam kelompok belajar, terdapat perbedaan pendapat antar anggota tim.",
+                options: [
+                    { text: "Memaksa semua orang mengikuti pendapat kita", correct: false },
+                    { text: "Bermusyawarah secara tenang dan saling mendengarkan", correct: true },
+                    { text: "Marah dan keluar dari kelompok belajar", correct: false }
+                ]
+            }
+        ];
+
+        function startChoiceGame() {
+            choiceIndex = 0;
+            renderChoiceGame();
+            navigateTo('game3Screen');
+        }
+
+        function renderChoiceGame() {
+            const data = choiceScenarios[choiceIndex];
+            document.getElementById('choiceScoreBadge').innerText = `Kasus ${choiceIndex + 1}/${choiceScenarios.length}`;
+            document.getElementById('choiceScenarioText').innerText = data.text;
+            document.getElementById('choiceFeedback').classList.add('hidden');
+
+            const container = document.getElementById('choiceOptionsContainer');
+            container.innerHTML = '';
+
+            data.options.forEach((opt, idx) => {
+                container.innerHTML += `
+                    <button onclick="handleChoiceAnswer(${opt.correct})" class="w-full text-left p-4 bg-slate-50 hover:bg-emerald-50 border-2 border-slate-200 hover:border-emerald-400 rounded-2xl font-semibold text-slate-700 transition">
+                        ${String.fromCharCode(65 + idx)}. ${opt.text}
+                    </button>
+                `;
+            });
+        }
+
+        function handleChoiceAnswer(isCorrect) {
+            const feedback = document.getElementById('choiceFeedback');
+            feedback.classList.remove('hidden');
+
+            if (isCorrect) {
+                playSound('correct');
+                feedback.className = "p-3 mt-4 rounded-xl text-center font-bold text-sm bg-emerald-100 text-emerald-800 animate-pop";
+                feedback.innerText = "Pilihan Sangat Bijak &amp; Terpuji! ⭐";
+            } else {
+                playSound('wrong');
+                feedback.className = "p-3 mt-4 rounded-xl text-center font-bold text-sm bg-red-100 text-red-800 animate-pop";
+                feedback.innerText = "Itu Bukan Sikap Interaksi Yang Baik. Yuk Pilih Lagi! 💡";
+                return; // Let user try again on wrong choice
+            }
+
+            setTimeout(() => {
+                choiceIndex++;
+                if (choiceIndex < choiceScenarios.length) {
+                    renderChoiceGame();
+                } else {
+                    confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
+                    alert("Hebat! Kamu telah menjadi Detektif Sikap Baik yang Pintar!");
+                    navigateTo('gameHubScreen');
+                }
+            }, 1200);
+        }
+
+
+        /* -------------------------------------------------------------
+           7. KUIS EVALUASI (10 SOAL LENGKAP & PEMBAHASAN)
+           ------------------------------------------------------------- */
+        let quizCurrentIndex = 0;
+        let quizScore = 0;
+        let quizAnswered = false;
+
+        const quizDatabase = [
+            {
+                q: "Hubungan timbal balik antara individu dengan individu, individu dengan kelompok, atau kelompok dengan kelompok disebut...",
+                options: ["Interaksi Sosial", "Komunikasi Satu Arah", "Kerja Sendiri", "Persaingan Individual"],
+                correct: 0,
+                explanation: "Interaksi sosial adalah hubungan timbal balik saling mempengaruhi antar manusia."
+            },
+            {
+                q: "Dua syarat utama agar interaksi sosial dapat terjadi adalah...",
+                options: ["Kontak Sosial dan Komunikasi", "Uang dan Barang", "Rumah dan Sekolah", "Buku dan Pensil"],
+                correct: 0,
+                explanation: "Kontak sosial dan komunikasi merupakan syarat mutlak terjadinya interaksi."
+            },
+            {
+                q: "Ibu guru yang sedang mengajar siswa-siswi di dalam kelas merupakan contoh interaksi antara...",
+                options: ["Kelompok dengan Kelompok", "Individu dengan Individu", "Individu dengan Kelompok", "Manusia dengan Benda"],
+                correct: 2,
+                explanation: "Ibu guru (1 orang / individu) berinteraksi dengan siswa kelas (banyak orang / kelompok)."
+            },
+            {
+                q: "Berikut ini yang merupakan contoh interaksi sosial positif di lingkungan rumah adalah...",
+                options: ["Berebut mainan dengan adik", "Membantu orang tua membersihkan rumah", "Abaikan panggilan ayah", "Menonton TV seharian"],
+                correct: 1,
+                explanation: "Membantu orang tua merupakan bentuk kerja sama dan interaksi baik di dalam keluarga."
+            },
+            {
+                q: "Kegiatan gotong royong warga membersihkan selokan desa merupakan contoh interaksi di lingkungan...",
+                options: ["Sekolah", "Masyarakat", "Pasar Modern", "Keluarga"],
+                correct: 1,
+                explanation: "Gotong royong warga desa melibatkan seluruh anggota masyarakat di lingkungan sekitar tempat tinggal."
+            },
+            {
+                q: "Manusia disebut sebagai makhluk sosial karena...",
+                options: ["Dapat hidup sendiri tanpa orang lain", "Tidak membutuhkan teman", "Selalu membutuhkan bantuan orang lain", "Suka menyendiri"],
+                correct: 2,
+                explanation: "Sebagai makhluk sosial, manusia tidak bisa memenuhi semua kebutuhannya sendiri tanpa orang lain."
+            },
+            {
+                q: "Bentuk interaksi sosial di mana orang-orang bekerja sama untuk mencapai tujuan bersama disebut...",
+                options: ["Kerja Sama", "Pertengkaran", "Persaingan", "Perkelahian"],
+                correct: 0,
+                explanation: "Kerja sama adalah usaha bersama antar individu atau kelompok untuk mencapai tujuan bersama."
+            },
+            {
+                q: "Contoh interaksi sosial yang kurang baik dan harus kita hindari di sekolah adalah...",
+                options: ["Mengejek teman yang kalah bermain", "Berdiskusi tugas kelompok", "Menyapa guru saat bertemu", "Berbagi bekal makanan"],
+                correct: 0,
+                explanation: "Mengejek atau membully merupakan contoh interaksi negatif yang merusak pertemanan."
+            },
+            {
+                q: "Ketika sahabatmu terjatuh dan terluka di halaman sekolah, sikap yang sesuai dengan interaksi terpuji adalah...",
+                options: ["Pura-pura tidak tahu", "Menolong dan membawanya ke UKS", "Menertawakannya", "Memfotonya"],
+                correct: 1,
+                explanation: "Tolong-menolong merupakan wujud nyata empati dan interaksi sosial yang baik."
+            },
+            {
+                q: "Contoh kontak sosial secara TIDAK langsung adalah...",
+                options: ["Berjabat tangan saat menyapa", "Tatap muka di dalam kelas", "Mengirim pesan lewat telepon seluler", "Berpelukan dengan kakek"],
+                correct: 2,
+                explanation: "Pesan telepon/WhatsApp adalah media komunikasi tidak langsung karena menggunakan alat perantara."
+            }
+        ];
+
+        function startQuiz() {
+            quizCurrentIndex = 0;
+            quizScore = 0;
+            renderQuizQuestion();
+            navigateTo('quizScreen');
+        }
+
+        function renderQuizQuestion() {
+            quizAnswered = false;
+            const data = quizDatabase[quizCurrentIndex];
+
+            document.getElementById('quizNumBadge').innerText = `${quizCurrentIndex + 1} / ${quizDatabase.length}`;
+            document.getElementById('quizQuestionText').innerText = `${quizCurrentIndex + 1}. ${data.q}`;
+
+            // Hide Next button & Explanation
+            document.getElementById('nextQuizBtn').classList.add('hidden');
+            const expBox = document.getElementById('quizExplanationBox');
+            expBox.classList.add('hidden');
+
+            const optionsBox = document.getElementById('quizOptionsBox');
+            optionsBox.innerHTML = '';
+
+            data.options.forEach((optText, i) => {
+                const letter = String.fromCharCode(65 + i);
+                optionsBox.innerHTML += `
+                    <button onclick="checkQuizAnswer(${i}, this)" class="w-full text-left p-3.5 bg-slate-50 hover:bg-orange-50 border-2 border-slate-200 hover:border-orange-300 rounded-2xl font-semibold text-slate-700 transition flex items-center gap-3">
+                        <span class="w-8 h-8 rounded-xl bg-orange-100 text-orange-700 font-bold flex items-center justify-center text-sm">${letter}</span>
+                        <span class="text-xs md:text-sm flex-1">${optText}</span>
+                    </button>
+                `;
+            });
+        }
+
+        function checkQuizAnswer(selectedIdx, btnEl) {
+            if (quizAnswered) return;
+            quizAnswered = true;
+
+            const data = quizDatabase[quizCurrentIndex];
+            const allOptionBtns = document.querySelectorAll('#quizOptionsBox button');
+
+            // Disable all options
+            allOptionBtns.forEach(b => b.disabled = true);
+
+            const expBox = document.getElementById('quizExplanationBox');
+            expBox.classList.remove('hidden');
+
+            if (selectedIdx === data.correct) {
+                playSound('correct');
+                quizScore += 10;
+                btnEl.className = "w-full text-left p-3.5 bg-emerald-100 border-2 border-emerald-500 rounded-2xl font-semibold text-emerald-900 flex items-center gap-3 animate-pop";
+                expBox.className = "p-4 rounded-2xl mb-6 font-sans text-xs md:text-sm border bg-emerald-50 border-emerald-200 text-emerald-900 animate-pop";
+                expBox.innerHTML = `<strong><i class="fa-solid fa-circle-check mr-1 text-emerald-600"></i> Jawabanmu Benar!</strong><p class="mt-1">${data.explanation}</p>`;
+            } else {
+                playSound('wrong');
+                btnEl.className = "w-full text-left p-3.5 bg-red-100 border-2 border-red-500 rounded-2xl font-semibold text-red-900 flex items-center gap-3 animate-pop";
+
+                // Highlight correct option
+                allOptionBtns[data.correct].className = "w-full text-left p-3.5 bg-emerald-100 border-2 border-emerald-500 rounded-2xl font-semibold text-emerald-900 flex items-center gap-3";
+
+                expBox.className = "p-4 rounded-2xl mb-6 font-sans text-xs md:text-sm border bg-red-50 border-red-200 text-red-900 animate-pop";
+                expBox.innerHTML = `<strong><i class="fa-solid fa-circle-xmark mr-1 text-red-600"></i> Jawaban Kurang Tepat!</strong><p class="mt-1">${data.explanation}</p>`;
+            }
+
+            // Show next button
+            document.getElementById('nextQuizBtn').classList.remove('hidden');
+        }
+
+        function nextQuizQuestion() {
+            playSound('click');
+            quizCurrentIndex++;
+            if (quizCurrentIndex < quizDatabase.length) {
+                renderQuizQuestion();
+            } else {
+                showQuizResult();
+            }
+        }
+
+        function showQuizResult() {
+            document.getElementById('quizFinalScore').innerText = quizScore;
+            const categoryBadge = document.getElementById('quizCategoryBadge');
+            const resultTitle = document.getElementById('resultTitle');
+            const resultIcon = document.getElementById('resultIcon');
+
+            if (quizScore >= 80) {
+                categoryBadge.innerText = "Kategori: Sangat Baik / Sangat Paham";
+                resultTitle.innerText = "Luar Biasa! 🎉";
+                resultIcon.className = "w-24 h-24 rounded-full bg-emerald-100 text-emerald-500 flex items-center justify-center text-5xl mx-auto mb-4 shadow-inner";
+                resultIcon.innerHTML = `<i class="fa-solid fa-trophy"></i>`;
+                confetti({ particleCount: 100, spread: 80, origin: { y: 0.5 } });
+            } else if (quizScore >= 60) {
+                categoryBadge.innerText = "Kategori: Cukup / Boleh Ditingkatkan";
+                resultTitle.innerText = "Bagus Sekali! 👍";
+                resultIcon.className = "w-24 h-24 rounded-full bg-amber-100 text-amber-500 flex items-center justify-center text-5xl mx-auto mb-4 shadow-inner";
+                resultIcon.innerHTML = `<i class="fa-solid fa-star"></i>`;
+            } else {
+                categoryBadge.innerText = "Kategori: Perlu Belajar Lagi";
+                resultTitle.innerText = "Jangan Patah Semangat! 💪";
+                resultIcon.className = "w-24 h-24 rounded-full bg-sky-100 text-sky-500 flex items-center justify-center text-5xl mx-auto mb-4 shadow-inner";
+                resultIcon.innerHTML = `<i class="fa-solid fa-book-open"></i>`;
+            }
+
+            navigateTo('quizResultScreen');
+        }
+
+        function restartQuiz() {
+            startQuiz();
+        }
+
+        // Initialize default view to welcome screen on load
+        window.onload = function() {
+            navigateTo('welcomeScreen');
+        };
+    </script>
+</body>
+</html>
